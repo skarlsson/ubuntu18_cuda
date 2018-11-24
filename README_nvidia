@@ -1,0 +1,24 @@
+#on laptop
+sudo apt -y update
+sudo apt-get install ssh ansible
+
+
+ssh-copy-id ubuntu@10.10.10.10
+
+
+// ssh to the machine
+sudo apt remove --purge cuda-*
+sudo apt remove --purge nvidia-*
+
+//from laptop
+ansible-playbook -i inventory/hosts initial-ubuntu18.yml --limit ml3 -u ubuntu --ask-sudo-pass 
+
+
+//on machine
+add to .bashrc
+export LD_LIBRARY_PATH=$LDLIBRARY_PATH:/usr/local/cuda-10.0/lib
+export PATH=$PATH:/usr/local/cuda-10.0/bin
+
+
+
+
