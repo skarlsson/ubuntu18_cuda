@@ -22,6 +22,7 @@
     - apt_key: url=https://download.docker.com/linux/ubuntu/gpg state=present
     - apt_key: url=https://packages.cloud.google.com/apt/doc/apt-key.gpg state=present
     - apt_key: url=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub state=present
+    - apt_key: url=https://nvidia.github.io/nvidia-docker/gpgkey state=present
     - apt_repository: repo={{ item }} state=present
       with_items:
         - deb http://us.archive.ubuntu.com/ubuntu/ bionic main restricted
@@ -36,6 +37,7 @@
         - deb http://security.ubuntu.com/ubuntu bionic-security multiverse
         - deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
         - ppa:graphics-drivers/ppa
+    - get_url: url=https://nvidia.github.io/nvidia-docker/ubuntu18.04/nvidia-docker.list dest=/etc/apt/sources.list.d/nvidia-docker.list
     - stat: path=/etc/cloud/cloud.cfg
       register: cloud_config
     - lineinfile: 'dest=/etc/cloud/cloud.cfg state=present regexp="^preserve_hostname:" line="preserve_hostname: true"'
@@ -57,7 +59,7 @@
        - curl
        - software-properties-common
        - intel-microcode
-       - nvidia-driver-410
+       - nvidia-driver-415
        - build-essential 
        - dkms
        - freeglut3 
@@ -80,7 +82,6 @@
        - docker-ce
        - python3-pip
        - python-pip
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
     - lineinfile: path=/lib/systemd/system/docker.service state=absent regexp='^LimitNOFILE='
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
     - pip: name=docker
@@ -89,5 +90,9 @@
     - user: name=ubuntu shell=/bin/bash groups=adm,sudo,wheel append=yes
     - lineinfile: "dest=/etc/sudoers state=present line='%sudo ALL=(ALL) NOPASSWD: ALL'"
     - lineinfile: path=/etc/hosts state=present regexp='^10.1.47.1 ' line='10.1.47.1 lb.bitbouncer.com'
+    - package: name={{ item }} state=latest
+      with_items:
+       - nvidia-docker2
+
 
 
